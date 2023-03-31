@@ -26,6 +26,11 @@ function getEgg(number: number) {
 @customElement("x-crack-page")
 export class CrackPage extends TwLitElement {
   static styles = css`
+    code {
+      padding: 4px;
+      background: #ffd256;
+    }
+
     .egg {
       animation: shaking 1s ease-in-out infinite;
     }
@@ -53,7 +58,7 @@ export class CrackPage extends TwLitElement {
 
         <x-chat-bubble>
           <p>
-            Dette egget er <code>kul</code> og <code>dum</code> og må oppnå en perfeksjons-score på <code>e3b99</code>
+            Dette egget er <code>kul</code> og <code>dum</code> og har <code>e3b99</code> som sin "lykke-kode"
           </p>
         </x-chat-bubble>
           

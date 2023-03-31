@@ -21,7 +21,7 @@ export class Ducky extends TwLitElement {
           </x-chat-bubble>
         </div>
         <div class="mt-16 flex h-40">
-          <img src="${ducky}" class="absolute w-40 h-40" />
+          <img src="${ducky}" class="lg:absolute w-40 h-40" />
           <div class="flex flex-grow items-center justify-around">
             <slot></slot>
           </div>

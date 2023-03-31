@@ -96,7 +96,7 @@ export class EggCrackTerminal extends TwLitElement {
     solveMessageElement.innerText = `OK - Cracked egg on attempt ${numberOfHashes}`;
 
     this.terminal.appendChild(solveMessageElement);
-    setTimeout(() => this.dispatchEvent(new CustomEvent('resolve', { bubbles: true })), 3000)
+    setTimeout(() => this.dispatchEvent(new CustomEvent('resolve', { bubbles: true })), 4000)
   }
 
 
