@@ -45,7 +45,7 @@ export class Modal extends TwLitElement {
   }
 }
 
-export default function (element: CustomElementConstructor | HTMLElement | string, parameters: object = {}, mount: HTMLElement = document.body): Promise<any> {
+export default function (element: CustomElementConstructor | HTMLElement | string, parameters: object = {}, closeWhen?: Promise<any>, mount: HTMLElement = document.body): Promise<any> {
   let mountableElement!: HTMLElement;
   if (element instanceof Function) {
     mountableElement = new element;
@@ -66,6 +66,18 @@ export default function (element: CustomElementConstructor | HTMLElement | strin
   mount.appendChild(modal);
 
   return new Promise((resolve, reject) => {
+    if (!!closeWhen) {
+      closeWhen
+        .then(res => {
+          modal.remove();
+          resolve(res);
+        })
+        .catch(rej => {
+          modal.remove();
+          reject(rej);
+        });
+    }
+
     modal.addEventListener('resolve', (event: CustomEvent) => {
       resolve(event.detail);
     });

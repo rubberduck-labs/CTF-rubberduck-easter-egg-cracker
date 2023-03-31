@@ -3,10 +3,12 @@ import { html, css, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { TwLitElement } from "../common/TwLitElement";
 import spawnModal from '../common/Modal';
+import type { Session } from '../../api/next_egg';
 
 import "../components/ChatBubble";
 import "../components/Ducky";
 import "../components/Button";
+import "../components/Loader";
 
 import egg_1 from "../assets/egg_1.png";
 import egg_2 from "../assets/egg_2.png";
@@ -19,7 +21,7 @@ function getEgg(number: number) {
     egg_2,
     egg_3,
     egg_4
-  ][number - 1];
+  ][number];
 }
 
 
@@ -45,27 +47,47 @@ export class CrackPage extends TwLitElement {
   `;
 
   private async startInspection() {
-    await spawnModal(((await import('../components/EggCrackTerminal')).EggCrackTerminal));
+    const answer = await spawnModal(((await import('../components/EggCrackTerminal')).EggCrackTerminal), { ...this.sessionInfo });
+    this.getNextEgg(answer);
   }
 
   @state()
-  private eggNumber = Math.floor(Math.random() * 4) + 1;
+  private sessionInfo?: Session;
+
+  private async getNextEgg(answer?: string) {
+    const apiPromise = fetch('/api/next_egg' + (!!answer ? `?padding=${answer}` : ''))
+      .then(response => response.json());
+
+    this.sessionInfo = await spawnModal((await import('../components/Loader')).Loader, {}, apiPromise);
+  }
+
+  connectedCallback(): void {
+    this.getNextEgg();
+    super.connectedCallback();
+  }
 
   render(): TemplateResult {
-    return html`
-      <div class="flex flex-col justify-center items-center">
-        <h1 class="text-5xl underline pb-14" >Egg nr. 1</h1>
+    if (!this.sessionInfo) {
+      return html``
+    } else {
+      return html`
+        <div class="flex flex-col justify-center items-center">
+          <h1 class="text-5xl underline pb-14" >Egg nr. ${this.sessionInfo?.solves + 1}</h1>
 
-        <x-chat-bubble>
-          <p>
-            Dette egget er <code>kul</code> og <code>dum</code> og har <code>e3b99</code> som sin "lykke-kode"
-          </p>
-        </x-chat-bubble>
-          
-        <img src="${getEgg(this.eggNumber)}" class="egg my-5 w-72 h-72" />
+          <x-chat-bubble>
+            <p>
+              Dette egget er
+              <code>${this.sessionInfo?.nonce_1}</code> og <code>${this.sessionInfo?.nonce_2}</code>
+              og har <code>${this.sessionInfo?.challenge}</code> som sin "lykke-kode"
+            </p>
+          </x-chat-bubble>
+            
+          <img src="${getEgg((this.sessionInfo?.solves) % 4)}" class="egg my-5 w-72 h-72" />
 
-        <x-button @click="${this.startInspection}">Start eggCrack.sh</x-button>
-      </div>
-    `;
+          <x-button @click="${this.startInspection}">Start eggCrack.sh</x-button>
+        </div>
+      `;
+    }
+    
   }
 }

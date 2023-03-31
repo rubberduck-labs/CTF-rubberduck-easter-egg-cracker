@@ -1,6 +1,6 @@
 import { css, TemplateResult } from "lit";
 import { html } from "lit";
-import { customElement, query, state } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 import { TwLitElement } from "../common/TwLitElement";
 
 @customElement("x-egg-crack-terminal")
@@ -59,6 +59,18 @@ export class EggCrackTerminal extends TwLitElement {
   @query('#terminal')
   private terminal: HTMLElement;
 
+  @state()
+  private started = false;
+
+  @property({ type: String })
+  public nonce_1: string;
+
+  @property({ type: String })
+  public nonce_2: string;
+
+  @property({ type: String })
+  public challenge: string;
+
 
   private async hash(string): Promise<string> {
     const utf8 = new TextEncoder().encode(string);
@@ -70,15 +82,14 @@ export class EggCrackTerminal extends TwLitElement {
     return hashHex;
   }
 
-  @state()
-  private started = false;
-
   private addHashToList(hash: string, valid: boolean) {
+    const answerLength = this.challenge.length;
+
     const hashLookupPartElement = document.createElement('span');
-    hashLookupPartElement.innerText = hash.substring(0, 5);
+    hashLookupPartElement.innerText = hash.substring(0, answerLength);
     
     const hashRestElement = document.createElement('span');
-    hashRestElement.innerText = hash.substring(5,35) + '...';
+    hashRestElement.innerText = hash.substring(answerLength, 35) + '...';
 
     const hashElement = document.createElement('p');
 
@@ -96,7 +107,7 @@ export class EggCrackTerminal extends TwLitElement {
     solveMessageElement.innerText = `OK - Cracked egg on attempt ${numberOfHashes}`;
 
     this.terminal.appendChild(solveMessageElement);
-    setTimeout(() => this.dispatchEvent(new CustomEvent('resolve', { bubbles: true })), 4000)
+    setTimeout(() => this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: numberOfHashes })), 4000)
   }
 
 
@@ -105,8 +116,8 @@ export class EggCrackTerminal extends TwLitElement {
       this.started = true;
 
       for (let i = 0; true; i++) {
-        const hash = await this.hash('a' + i);
-        const isValid = hash.startsWith('e3b99')
+        const hash = await this.hash(this.nonce_1 + this.nonce_2 + i);
+        const isValid = hash.startsWith(this.challenge)
 
         if (!(i % 20000) || isValid) {
           this.addHashToList(hash, isValid);
@@ -127,7 +138,7 @@ export class EggCrackTerminal extends TwLitElement {
     return html`
       <div class="rounded-md overflow-hidden terminal bg-black p-5 flex flex-col">
         <div id="terminal" class="flex flex-col">
-          <p class="line">sh ./eggCrack.sh</p>
+          <p class="line">sh ./eggCrack.sh -wanted-hash ${this.challenge}</p>
         </div>
         <p>><span class="cursor">_</span></p>
       </div>
