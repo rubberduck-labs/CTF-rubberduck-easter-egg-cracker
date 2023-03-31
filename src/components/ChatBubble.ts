@@ -64,7 +64,7 @@ export class ChatBubble extends TwLitElement {
   `
 
   @property({ type: String })
-  public width: string = '400px';
+  public width: string = '100%';
 
   render(): TemplateResult {
     return html`
