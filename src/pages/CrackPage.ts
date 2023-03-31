@@ -4,6 +4,7 @@ import { customElement, state } from "lit/decorators.js";
 import { TwLitElement } from "../common/TwLitElement";
 import spawnModal from '../common/Modal';
 import type { Session } from '../../api/next_egg';
+import confetti from 'canvas-confetti';
 
 import "../components/ChatBubble";
 import "../components/Ducky";
@@ -48,6 +49,7 @@ export class CrackPage extends TwLitElement {
 
   private async startInspection() {
     const answer = await spawnModal(((await import('../components/EggCrackTerminal')).EggCrackTerminal), { ...this.sessionInfo });
+    confetti({ particleCount: 100, spread: 70 });
     this.getNextEgg(answer);
   }
 
@@ -59,7 +61,6 @@ export class CrackPage extends TwLitElement {
       .then(response => response.json());
 
     this.sessionInfo = await spawnModal((await import('../components/Loader')).Loader, {}, apiPromise);
-    console.log(this.sessionInfo);
   }
 
   connectedCallback(): void {
@@ -68,6 +69,16 @@ export class CrackPage extends TwLitElement {
 
   render(): TemplateResult {
     if (this.sessionInfo?.reward) {
+      const end = Date.now() + (10 * 1000);
+      const colors = ['F72585', '7209B7', '3A0CA3', '4361EE', '4CC9F0'];
+      (function frame() {
+        confetti({ colors, particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } });
+        confetti({ colors, particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } });
+      
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
       return html`
         <div class="flex flex-col justify-center items-center">
           <img class="rounded-lg w-1/2" src="data:image/jpeg;base64,${this.sessionInfo.reward}" />
@@ -87,7 +98,7 @@ export class CrackPage extends TwLitElement {
             </p>
           </x-chat-bubble>
             
-          <img src="${getEgg((this.sessionInfo?.solves) % 4)}" class="egg my-5 w-72 h-72" />
+          <img id="egg" src="${getEgg((this.sessionInfo?.solves) % 4)}" class="egg my-5 w-72 h-72" />
 
           <x-button @click="${this.startInspection}">Start eggCrack.sh</x-button>
         </div>
