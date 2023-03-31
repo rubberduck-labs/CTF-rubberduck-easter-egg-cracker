@@ -34,12 +34,14 @@ export class EggCrackTerminal extends TwLitElement {
       color: white;
       font-size: 1.25em;
       font-family: monospace;
+      max-width: 100vw;
     }
 
     .line {
       width: 0px;
       white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
       animation: type .5s steps(20, end) forwards;
     }
 
@@ -89,7 +91,7 @@ export class EggCrackTerminal extends TwLitElement {
     hashLookupPartElement.innerText = hash.substring(0, answerLength);
     
     const hashRestElement = document.createElement('span');
-    hashRestElement.innerText = hash.substring(answerLength, 35) + '...';
+    hashRestElement.innerText = hash.substring(answerLength);
 
     const hashElement = document.createElement('p');
 
@@ -123,22 +125,23 @@ export class EggCrackTerminal extends TwLitElement {
           this.addHashToList(hash, isValid);
         }
         if (isValid) {
-          this.solve(i);
+          setTimeout(() => this.solve(i), 750);
           break;
         }
       }
     }
   }
 
-  updated(): void {
-    this.trySolve();
+  connectedCallback() {
+    super.connectedCallback();
+    setTimeout(() => this.trySolve(), 750);
   }
 
   render(): TemplateResult {
     return html`
       <div class="rounded-md overflow-hidden terminal bg-black p-5 flex flex-col">
         <div id="terminal" class="flex flex-col">
-          <p class="line">sh ./eggCrack.sh -n1 ${this.nonce_1} -n2 ${this.nonce_2} --hash ${this.challenge}</p>
+          <p class="line">sh ./eggCrack.sh --nonce ${this.nonce_1} --nonce ${this.nonce_2} --hash ${this.challenge}</p>
         </div>
         <p>><span class="cursor">_</span></p>
       </div>
