@@ -68,7 +68,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       };
 
       // Sign the new session
-      const signedNewSession = await signJwt(newSession, PRIVATE_KEY, 60 * 10);
+      const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
       res.setHeader('Set-Cookie', `session=${signedNewSession};`);
       return res.json(newSession);
     } else {
@@ -87,7 +87,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     };
 
     // Sign the new session, with an expiry date of 10 minutes
-    const signedNewSession = await signJwt(newSession, PRIVATE_KEY, 60 * 10);
+    const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
     res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
     return res.json(newSession);
   }
