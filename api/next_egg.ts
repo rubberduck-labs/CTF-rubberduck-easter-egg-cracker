@@ -28,6 +28,7 @@ const verifyJwt = (token, secret) => new Promise((resolve, reject) => {
 });
 const signJwt = (data, secret) => new Promise((resolve) => {
   const response = jwt.create(data, secret);
+  response.setExpiration(undefined);
   resolve(response);
 });
 
@@ -38,66 +39,72 @@ function getRandomHexString(size: number): string {
     .join('');
 }
 
+function createNewSession(solves: number = 0, error?: string) {
+  const newChallenge = getRandomHexString(4);
+  const newNounces = [getRandomNonce(), getRandomNonce()];
+  const newSession = {
+    nonce_1: newNounces[0],
+    nonce_2: newNounces[1],
+    challenge: newChallenge,
+    solves,
+    error: error.toString()
+  };
+
+  return newSession;
+}
+
 export default async function (req: VercelRequest, res: VercelResponse) {
-  const session = req.cookies['session'];
+  try {
+    const session = req.cookies['session'];
 
-  if (!!session) {
-    // If we have a session, parse the session as a JWT
-    const verifiedSession = await verifyJwt(session, PRIVATE_KEY) as Session;
-
-    // If the verified session has more than REQUIRED_SOLVES consecutive solves we respond with the flag
-    if (verifiedSession.solves >= REQUIRED_SOLVES) {
-      const reward = await import('./reward');
-      return res.json({ reward: reward.default });
-    }
-
-    // Our session is verified
-    // Get the challenge we want our user to solve & what the user suppiled as an answer to the challenge
-    const challengeToSolve = verifiedSession['challenge'] as string;
-    const adjustmentProvidedByUser = req.query['padding'] as string;
-
-    if (!adjustmentProvidedByUser) {
-      // No adjustment provided, keep current session
-      return res.json(verifiedSession);
-    }
-
-    // Check if the answer is a valid solution
-    const fullAnswer = verifiedSession.nonce_1 + verifiedSession.nonce_2 + adjustmentProvidedByUser;
-    const fullAnswerAsHash = createHash('sha256').update(fullAnswer).digest('hex');
-    const isValidAnswer = fullAnswerAsHash.startsWith(challengeToSolve);
-
-    if (isValidAnswer) {
-      // The user has provided a valid answer, we update their session with a new challenge and an increase to number of solves
-      const currentAmountOfSolves = verifiedSession['solves'];
-      const newChallenge = getRandomHexString(4);
-      const newNounces = [getRandomNonce(), getRandomNonce()];
-      const newSession = {
-        nonce_1: newNounces[0],
-        nonce_2: newNounces[1],
-        challenge: newChallenge,
-        solves: currentAmountOfSolves + 1
-      };
-
-      // Sign the new session
+    if (!!session) {
+      // If we have a session, parse the session as a JWT
+      const verifiedSession = await verifyJwt(session, PRIVATE_KEY) as Session;
+  
+      // If the verified session has more than REQUIRED_SOLVES consecutive solves we respond with the flag
+      if (verifiedSession.solves >= REQUIRED_SOLVES) {
+        const reward = await import('./reward');
+        return res.json({ reward: reward.default });
+      }
+  
+      // Our session is verified
+      // Get the challenge we want our user to solve & what the user suppiled as an answer to the challenge
+      const challengeToSolve = verifiedSession['challenge'] as string;
+      const adjustmentProvidedByUser = req.query['padding'] as string;
+  
+      if (!adjustmentProvidedByUser) {
+        // No adjustment provided, keep current session
+        return res.json(verifiedSession);
+      }
+  
+      // Check if the answer is a valid solution
+      const fullAnswer = verifiedSession.nonce_1 + verifiedSession.nonce_2 + adjustmentProvidedByUser;
+      const fullAnswerAsHash = createHash('sha256').update(fullAnswer).digest('hex');
+      const isValidAnswer = fullAnswerAsHash.startsWith(challengeToSolve);
+  
+      if (isValidAnswer) {
+        // The user has provided a valid answer, we update their session with a new challenge and an increase to number of solves
+        const currentAmountOfSolves = verifiedSession['solves'];
+        const newSession = createNewSession(currentAmountOfSolves + 1);
+  
+        // Sign the new session
+        const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
+        res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
+        return res.json(newSession);
+      } else {
+        // The answer was not valid, respond with 400 and do not update the session
+        return res.status(400).json({ error: 'bad challenge answer', ...verifiedSession });
+      }
+    } else {
+      // We don't have a session, start by creating a new session for the user
+      const newSession = createNewSession();
       const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
       res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
       return res.json(newSession);
-    } else {
-      // The answer was not valid, respond with 400 and do not update the session
-      return res.status(400).json({ error: 'bad challenge answer', ...verifiedSession });
     }
-  } else {
-    // We don't have a session, start by creating a new session for the user
-    const newChallenge = getRandomHexString(4);
-    const newNounces = [getRandomNonce(), getRandomNonce()];
-    const newSession = {
-      nonce_1: newNounces[0],
-      nonce_2: newNounces[1],
-      challenge: newChallenge,
-      solves: 0
-    };
-
-    // Sign the new session, with an expiry date of 10 minutes
+  } catch (error) {
+    console.error(error);
+    const newSession = createNewSession(0, error);
     const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
     res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
     return res.json(newSession);
