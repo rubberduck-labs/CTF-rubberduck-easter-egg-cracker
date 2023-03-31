@@ -47,7 +47,7 @@ function createNewSession(solves: number = 0, error?: string) {
     nonce_2: newNounces[1],
     challenge: newChallenge,
     solves,
-    error: error.toString()
+    error: error?.toString()
   };
 
   return newSession;
