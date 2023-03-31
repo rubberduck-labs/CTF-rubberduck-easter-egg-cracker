@@ -8,6 +8,5 @@
     "useDefineForClassFields": false,
     "baseUrl": "src"
   },
-  "include": ["src"],
-  "exclude": ["api"]
+  "include": ["src"]
 }
