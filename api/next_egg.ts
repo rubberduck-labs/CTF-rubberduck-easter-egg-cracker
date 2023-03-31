@@ -1,11 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'jsonwebtoken';
+import jwt from 'njwt';
 import { createHash } from 'crypto';
 import { getRandomNonce } from './nonces';
 
 const REQUIRED_SOLVES = process.env.REQUIRED_SOLVES || 100_000_000;
 const PRIVATE_KEY = process.env.PRIVATE_KEY || 'test';
-const FLAG = process.env.FLAG || 'flag';
 
 // Information we save in our session
 export type Session = {
@@ -15,11 +14,22 @@ export type Session = {
   nonce_2: string; // Second adjective
   challenge: string; // Our "lucky"-code. What we expect the user to solve
   solves: number; // Amout of solves our user has done in a row
+  reward: string; // The reward once our user reaches "REQUIRED_SOLVES"
 }
 
-// Create promise-based wrapper functions, this is purly for syntax futher down in our handler function
-const verifyJwt = (token, secret) => new Promise((resolve, reject) => jwt.verify(token, secret, (err, ok) => !!err ? reject(err) : resolve(ok)));
-const signJwt = (data, secret, expiry?) => new Promise((resolve) => resolve(jwt.sign(data, secret, (expiry ? { expiresIn: expiry } : undefined))));
+const verifyJwt = (token, secret) => new Promise((resolve, reject) => {
+  try {
+    const { alg } = JSON.parse(Buffer.from(token.split('.')[0], 'base64').toString('utf-8'));
+    const response = jwt.verify(token, secret, alg);
+    resolve(response.body);
+  } catch (error) {
+    reject(error);
+  }
+});
+const signJwt = (data, secret) => new Promise((resolve) => {
+  const response = jwt.create(data, secret);
+  resolve(response);
+});
 
 // Function to generate a random challange. Generates a random string consiting of hex characters
 function getRandomHexString(size: number): string {
@@ -37,7 +47,8 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 
     // If the verified session has more than REQUIRED_SOLVES consecutive solves we respond with the flag
     if (verifiedSession.solves >= REQUIRED_SOLVES) {
-      return res.json({ FLAG });
+      const reward = await import('./reward');
+      return res.json({ reward: reward.default });
     }
 
     // Our session is verified
@@ -69,7 +80,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 
       // Sign the new session
       const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
-      res.setHeader('Set-Cookie', `session=${signedNewSession};`);
+      res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
       return res.json(newSession);
     } else {
       // The answer was not valid, respond with 400 and do not update the session

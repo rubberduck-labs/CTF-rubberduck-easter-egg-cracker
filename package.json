@@ -20,7 +20,7 @@
   "dependencies": {
     "@vaadin/router": "^1.7.4",
     "@vercel/node": "^2.10.2",
-    "jsonwebtoken": "^9.0.0",
+    "njwt": "^2.0.0",
     "postcss": "^8.4.14"
   }
 }

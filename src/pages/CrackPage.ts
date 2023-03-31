@@ -59,16 +59,21 @@ export class CrackPage extends TwLitElement {
       .then(response => response.json());
 
     this.sessionInfo = await spawnModal((await import('../components/Loader')).Loader, {}, apiPromise);
+    console.log(this.sessionInfo);
   }
 
   connectedCallback(): void {
-    this.getNextEgg();
-    super.connectedCallback();
+    this.getNextEgg().then(() => super.connectedCallback());
   }
 
   render(): TemplateResult {
-    if (!this.sessionInfo) {
-      return html``
+    if (this.sessionInfo?.reward) {
+      return html`
+        <div class="flex flex-col justify-center items-center">
+          <img class="rounded-lg w-1/2" src="data:image/jpeg;base64,${this.sessionInfo.reward}" />
+          <p class="pt-5 text-lg">Ingen flere påskeegg å åpne! Påskeharen er stolt av deg!</p>
+        </div>
+      `
     } else {
       return html`
         <div class="flex flex-col justify-center items-center">
