@@ -138,7 +138,7 @@ export class EggCrackTerminal extends TwLitElement {
     return html`
       <div class="rounded-md overflow-hidden terminal bg-black p-5 flex flex-col">
         <div id="terminal" class="flex flex-col">
-          <p class="line">sh ./eggCrack.sh -wanted-hash ${this.challenge}</p>
+          <p class="line">sh ./eggCrack.sh -n1 ${this.nonce_1} -n2 ${this.nonce_2} --hash ${this.challenge}</p>
         </div>
         <p>><span class="cursor">_</span></p>
       </div>

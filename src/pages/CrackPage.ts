@@ -49,8 +49,8 @@ export class CrackPage extends TwLitElement {
 
   private async startInspection() {
     const answer = await spawnModal(((await import('../components/EggCrackTerminal')).EggCrackTerminal), { ...this.sessionInfo });
+    await this.getNextEgg(answer);
     confetti({ particleCount: 100, spread: 70 });
-    this.getNextEgg(answer);
   }
 
   @state()
