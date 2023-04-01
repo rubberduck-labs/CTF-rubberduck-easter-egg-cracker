@@ -1,72 +1,15 @@
 import { css, TemplateResult } from "lit";
 import { html } from "lit";
-import { customElement, property, query, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { TwLitElement } from "../common/TwLitElement";
+import { Terminal, TerminalCommandComplete } from "./Terminal";
+
+import "./Terminal";
 
 @customElement("x-egg-crack-terminal")
 export class EggCrackTerminal extends TwLitElement {
   static styles = css`
-    @keyframes blink {
-      0% {
-        opacity: 0;
-      }
-      40% {
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-
-    @keyframes type {
-      to {
-        width: 100%;
-      }
-    }
-
-    .terminal {
-      color: white;
-      font-size: 1.25em;
-      font-family: monospace;
-      max-width: 100vw;
-    }
-
-    .line {
-      width: 0px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      animation: type .5s steps(20, end) forwards;
-    }
-
-    .invalid {
-      color: #ef5350;
-    }
-
-    .valid {
-      color: #66bb6a;
-    }
-
-    .unimportant {
-      color: #949494;
-    }
-
-    .cursor {
-      animation: blink 1s infinite;
-    }
   `
-
-  @query('#terminal')
-  private terminal: HTMLElement;
-
-  @state()
-  private started = false;
 
   @property({ type: String })
   public adjective1: string;
@@ -76,6 +19,17 @@ export class EggCrackTerminal extends TwLitElement {
 
   @property({ type: String })
   public challenge: string;
+
+  @state()
+  private crackEggFunction: Function = undefined;
+
+  private crackEggPID: number;
+
+  private closeTerminal(result: CustomEvent<TerminalCommandComplete>) {
+    if (this.crackEggPID === result.detail.PID) {
+      this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: result.detail.result }))
+    }
+  }
 
 
   private async hash(string): Promise<string> {
@@ -88,74 +42,40 @@ export class EggCrackTerminal extends TwLitElement {
     return hashHex;
   }
 
-  private addHashToList(hash: string, valid: boolean) {
-    const answerLength = this.challenge.length;
+  firstUpdated() {
+    if (!this.crackEggFunction) {
+      this.crackEggFunction = async (context: Terminal) => {
+        this.crackEggPID = context.runningPID;
+        const println = context.getWriter();
 
-    const hashLookupPartElement = document.createElement('span');
-    hashLookupPartElement.innerText = hash.substring(0, answerLength);
-    hashLookupPartElement.classList.add(valid ? 'valid' : 'invalid');
-    
-    const hashRestElement = document.createElement('span');
-    hashRestElement.innerText = hash.substring(answerLength);
-    hashRestElement.classList.add('unimportant');
-
-    const hashElement = document.createElement('p');
-    hashElement.classList.add('line');
-    hashElement.appendChild(hashLookupPartElement);
-    hashElement.appendChild(hashRestElement);
-
-    this.terminal.appendChild(hashElement);
-  }
-
-  private solve(numberOfHashes: number) {
-    const okMessageElement = document.createElement('span');
-    okMessageElement.innerText = '[OK]';
-    okMessageElement.classList.add('valid');
-
-    const restMessageElement = document.createElement('span');
-    restMessageElement.innerText = ` - Cracked egg with adjustment ${numberOfHashes}`;
-
-    const solveMessageElement = document.createElement('p');;
-    solveMessageElement.classList.add('line');
-    solveMessageElement.appendChild(okMessageElement);
-    solveMessageElement.appendChild(restMessageElement);
-
-    this.terminal.appendChild(solveMessageElement);
-    setTimeout(() => this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: numberOfHashes })), 4000)
-  }
-
-
-  private async trySolve() {
-    if (!this.started) {
-      this.started = true;
-
-      for (let i = 0; true; i++) {
-        const hash = await this.hash(this.adjective1 + this.adjective2 + i);
-        const isValid = hash.startsWith(this.challenge)
-
-        if (!(i % 20000) || isValid) {
-          this.addHashToList(hash, isValid);
-        }
-        if (isValid) {
-          setTimeout(() => this.solve(i), 750);
-          break;
+        await println(`sh ./eggCrack.sh --desc1 ${this.adjective1} --desc2 ${this.adjective2} --hash ${this.challenge}`);
+        for (let i = 0; true; i++) {
+          const hash = await this.hash(this.adjective1 + this.adjective2 + i);
+          const isValid = hash.startsWith(this.challenge)
+      
+          if (!(i % 20000) || isValid) {
+            const answerLength = this.challenge.length;
+            const checkPart = hash.substring(0, answerLength);
+            const restPart = hash.substring(answerLength);
+      
+            println(`<span class="${isValid ? 'valid' : 'invalid'}">${checkPart}</span><span class="unimportant">${restPart}</span>`);
+          }
+          if (isValid) {
+            await println(`<span class="valid">[OK]</span> - Cracked egg with adjustment ${i}`);
+            return i;
+          }
         }
       }
     }
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    setTimeout(() => this.trySolve(), 750);
-  }
-
   render(): TemplateResult {
     return html`
-      <div class="rounded-md overflow-hidden terminal bg-black p-5 flex flex-col">
-        <div id="terminal" class="flex flex-col">
-          <p class="line">sh ./eggCrack.sh --desc1 ${this.adjective1} --desc2 ${this.adjective2} --hash ${this.challenge}</p>
-        </div>
-        <p>><span class="cursor">_</span></p>
+      <div class="rounded-md overflow-hidden">
+        <x-terminal
+          .run="${this.crackEggFunction}"
+          @command-complete="${this.closeTerminal}"
+        ></x-terminal>
       </div>
     `;
   }

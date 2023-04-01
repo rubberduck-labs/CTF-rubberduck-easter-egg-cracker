@@ -1,7 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import jwt from 'njwt';
 import { createHash } from 'crypto';
-import { getRandomAdjective } from './adjectives';
+import { getRandomAdjective } from '../api_resources/adjectives';
+import { readFileSync } from 'fs';
+import path from 'path';
+import jwt from 'njwt';
 
 const REQUIRED_SOLVES = process.env.REQUIRED_SOLVES || 100_000_000;
 const PRIVATE_KEY = process.env.PRIVATE_KEY || 'test';
@@ -63,8 +65,8 @@ export default async function (req: VercelRequest, res: VercelResponse) {
   
       // If the verified session has more than REQUIRED_SOLVES consecutive solves we respond with the flag
       if (verifiedSession.solves >= REQUIRED_SOLVES) {
-        const reward = await import('./reward');
-        return res.json({ reward: reward.default });
+        const reward = readFileSync(path.join(process.cwd(), 'api_resources', 'reward.jpeg'), 'base64');
+        return res.json({ reward: reward });
       }
   
       // Our session is verified
