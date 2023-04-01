@@ -10,7 +10,7 @@
     "api/easter_egg.ts": {
       "memory": 128,
       "maxDuration": 2,
-      "excludeFiles": "api_resources/easter_egg.png"
+      "includeFiles": "api_resources/commandline_root/**"
     }
   }
 }
