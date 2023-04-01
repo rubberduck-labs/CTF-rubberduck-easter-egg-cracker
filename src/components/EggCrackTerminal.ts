@@ -2,6 +2,7 @@ import { css, TemplateResult } from "lit";
 import { html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { TwLitElement } from "../common/TwLitElement";
+import Sleep from "../common/Sleep";
 import { Terminal, TerminalCommandComplete } from "./Terminal";
 
 import "./Terminal";
@@ -62,6 +63,7 @@ export class EggCrackTerminal extends TwLitElement {
           }
           if (isValid) {
             await println(`<span class="valid">[OK]</span> - Cracked egg with adjustment ${i}`);
+            await Sleep(1500); // Wait a few seconds for the user to read OK message
             return i;
           }
         }
