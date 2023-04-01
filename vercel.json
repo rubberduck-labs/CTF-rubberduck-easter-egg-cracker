@@ -7,10 +7,15 @@
     }
   ],
   "functions": {
-    "api/easter_egg.ts": {
+    "api/command_line/*.ts": {
       "memory": 128,
       "maxDuration": 2,
-      "includeFiles": "api_resources/commandline_root/**"
+      "includeFiles": "api_resources/commandline/*"
+    },
+    "api/next_egg.ts": {
+      "memory": 128,
+      "maxDuration": 2,
+      "includeFiles": "api_resources/reward.jpeg"
     }
   }
 }
