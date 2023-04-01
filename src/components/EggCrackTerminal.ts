@@ -65,10 +65,10 @@ export class EggCrackTerminal extends TwLitElement {
   private started = false;
 
   @property({ type: String })
-  public nonce_1: string;
+  public adjective1: string;
 
   @property({ type: String })
-  public nonce_2: string;
+  public adjective2: string;
 
   @property({ type: String })
   public challenge: string;
@@ -118,7 +118,7 @@ export class EggCrackTerminal extends TwLitElement {
       this.started = true;
 
       for (let i = 0; true; i++) {
-        const hash = await this.hash(this.nonce_1 + this.nonce_2 + i);
+        const hash = await this.hash(this.adjective1 + this.adjective2 + i);
         const isValid = hash.startsWith(this.challenge)
 
         if (!(i % 20000) || isValid) {
@@ -141,7 +141,7 @@ export class EggCrackTerminal extends TwLitElement {
     return html`
       <div class="rounded-md overflow-hidden terminal bg-black p-5 flex flex-col">
         <div id="terminal" class="flex flex-col">
-          <p class="line">sh ./eggCrack.sh --nonce ${this.nonce_1} --nonce ${this.nonce_2} --hash ${this.challenge}</p>
+          <p class="line">sh ./eggCrack.sh --desc1 ${this.adjective1} --desc2 ${this.adjective2} --hash ${this.challenge}</p>
         </div>
         <p>><span class="cursor">_</span></p>
       </div>

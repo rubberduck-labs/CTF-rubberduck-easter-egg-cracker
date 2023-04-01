@@ -53,7 +53,7 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
 
   Et eksempel på en slik session er:
   ```
-  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJub25jZV8xIjoibHlzIiwibm9uY2VfMiI6ImjDuHl0ZWtub2xvZ2lzayIsImNoYWxsZW5nZSI6IjQwYTgiLCJzb2x2ZXMiOjE3LCJqdGkiOiJhZjRkMzM5OC1jNGExLTQwNjgtYTk3OS0yYzA2ZWM2NTg5ZDUiLCJpYXQiOjE2ODAyOTYwMjAsImV4cCI6MTY4MDI5OTYyMH0.Y_PRAzod6VyFG021w
+  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZGplY3RpdmUxIjoibHlzIiwiYWRqZWN0aXZlMiI6ImjDuHl0ZWtub2xvZ2lzayIsImNoYWxsZW5nZSI6IjQwYTgiLCJzb2x2ZXMiOjE3LCJqdGkiOiJhZjRkMzM5OC1jNGExLTQwNjgtYTk3OS0yYzA2ZWM2NTg5ZDUiLCJpYXQiOjE2ODAyOTYwMjAsImV4cCI6MTY4MDI5OTYyMH0.Y_PRAzod6VyFG021w
   ```
 
   En JWT er delt opp i tre base64-encoded deler: `header`, `payload` og `signature`. Dersom vi decoder vår JWT får vi følgende strukturer tilbake:
@@ -64,8 +64,8 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
       "alg": "HS256"
     },
     {
-      "nonce_1": "lys",
-      "nonce_2": "høyteknologisk",
+      "adjective1": "lys",
+      "adjective2": "høyteknologisk",
       "challenge": "40a8",
       "solves": 17,
       "jti": "af4d3398-c4a1-4068-a979-2c06ec6589d5",
@@ -89,8 +89,8 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
       "alg": "none"
     },
     {
-      "nonce_1": "lys",
-      "nonce_2": "høyteknologisk",
+      "adjective1": "lys",
+      "adjective2": "høyteknologisk",
       "challenge": "40a8",
       "solves": 100000000,
       "jti": "af4d3398-c4a1-4068-a979-2c06ec6589d5",
@@ -103,7 +103,7 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
   Dersom vi nå koder denne strukturen tilbake til en gyldig JWT:
 
   ```
-  eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJub25jZV8xIjoibHlzIiwibm9uY2VfMiI6ImjDuHl0ZWtub2xvZ2lzayIsImNoYWxsZW5nZSI6IjQwYTgiLCJzb2x2ZXMiOjEwMDAwMDAwMCwianRpIjoiYWY0ZDMzOTgtYzRhMS00MDY4LWE5NzktMmMwNmVjNjU4OWQ1IiwiaWF0IjoxNjgwMjk2MDIwLCJleHAiOjE2ODAyOTk2MjB9
+  eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhZGplY3RpdmUxIjoibHlzIiwiYWRqZWN0aXZlMiI6ImjDuHl0ZWtub2xvZ2lzayIsImNoYWxsZW5nZSI6IjQwYTgiLCJzb2x2ZXMiOjEwMDAwMDAwMCwianRpIjoiYWY0ZDMzOTgtYzRhMS00MDY4LWE5NzktMmMwNmVjNjU4OWQ1IiwiaWF0IjoxNjgwMjk2MDIwLCJleHAiOjE2ODAyOTk2MjB9
   ```
 
   Så kan den brukes for å "lure" serveren til å tro at vi nå har åpnet 100 000 000 påskeegg og gi oss belønningen våres

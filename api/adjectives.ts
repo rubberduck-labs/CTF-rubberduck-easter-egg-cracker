@@ -1,4 +1,4 @@
-export const nonces = [
+export const adjectives = [
   "liten",
   "stor",
   "lang",
@@ -190,6 +190,6 @@ export const nonces = [
   "konstant"
 ];
 
-export function getRandomNonce() {
-  return nonces[Math.floor(Math.random() * nonces.length)];
+export function getRandomAdjective() {
+  return adjectives[Math.floor(Math.random() * adjectives.length)];
 }

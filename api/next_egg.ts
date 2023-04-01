@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'njwt';
 import { createHash } from 'crypto';
-import { getRandomNonce } from './nonces';
+import { getRandomAdjective } from './adjectives';
 
 const REQUIRED_SOLVES = process.env.REQUIRED_SOLVES || 100_000_000;
 const PRIVATE_KEY = process.env.PRIVATE_KEY || 'test';
@@ -10,8 +10,8 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY || 'test';
 export type Session = {
   iat: number; // Issued at
   exp: number; // Expires at
-  nonce_1: string; // First adjective
-  nonce_2: string; // Second adjective
+  adjective1: string; // First adjective
+  adjective2: string; // Second adjective
   challenge: string; // Our "lucky"-code. What we expect the user to solve
   solves: number; // Amout of solves our user has done in a row
   reward: string; // The reward once our user reaches "REQUIRED_SOLVES"
@@ -28,7 +28,7 @@ const verifyJwt = (token, secret) => new Promise((resolve, reject) => {
 });
 const signJwt = (data, secret) => new Promise((resolve) => {
   const response = jwt.create(data, secret);
-  response.setExpiration(undefined);
+  response.setExpiration(new Date().getTime() + (24*60*60*1000)); // 24 hours from now
   resolve(response);
 });
 
@@ -41,10 +41,10 @@ function getRandomHexString(size: number): string {
 
 function createNewSession(solves: number = 0, error?: string) {
   const newChallenge = getRandomHexString(4);
-  const newNounces = [getRandomNonce(), getRandomNonce()];
+  const newAdjectives = [getRandomAdjective(), getRandomAdjective()];
   const newSession = {
-    nonce_1: newNounces[0],
-    nonce_2: newNounces[1],
+    adjective1: newAdjectives[0],
+    adjective2: newAdjectives[1],
     challenge: newChallenge,
     solves,
     error: error?.toString()
@@ -78,7 +78,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       }
   
       // Check if the answer is a valid solution
-      const fullAnswer = verifiedSession.nonce_1 + verifiedSession.nonce_2 + adjustmentProvidedByUser;
+      const fullAnswer = verifiedSession.adjective1 + verifiedSession.adjective2 + adjustmentProvidedByUser;
       const fullAnswerAsHash = createHash('sha256').update(fullAnswer).digest('hex');
       const isValidAnswer = fullAnswerAsHash.startsWith(challengeToSolve);
   

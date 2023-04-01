@@ -93,7 +93,7 @@ export class CrackPage extends TwLitElement {
           <x-chat-bubble>
             <p>
               Dette egget er
-              <code>${this.sessionInfo?.nonce_1}</code> og <code>${this.sessionInfo?.nonce_2}</code>
+              <code>${this.sessionInfo?.adjective1}</code> og <code>${this.sessionInfo?.adjective2}</code>
               og har <code>${this.sessionInfo?.challenge}</code> som sin "lykke-kode"
             </p>
           </x-chat-bubble>
