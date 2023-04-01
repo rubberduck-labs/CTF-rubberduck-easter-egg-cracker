@@ -53,7 +53,7 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
 
   Et eksempel på en slik session er:
   ```
-  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZGplY3RpdmUxIjoibHlzIiwiYWRqZWN0aXZlMiI6ImjDuHl0ZWtub2xvZ2lzayIsImNoYWxsZW5nZSI6IjQwYTgiLCJzb2x2ZXMiOjE3LCJqdGkiOiJhZjRkMzM5OC1jNGExLTQwNjgtYTk3OS0yYzA2ZWM2NTg5ZDUiLCJpYXQiOjE2ODAyOTYwMjAsImV4cCI6MTY4MDI5OTYyMH0.Y_PRAzod6VyFG021w
+  eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZGplY3RpdmUxIjoiZnJhc3TDuHRlbmRlIiwiYWRqZWN0aXZlMiI6Imh1bXBldGUiLCJjaGFsbGVuZ2UiOiI4ZGExIiwic29sdmVzIjowLCJqdGkiOiJmMWM4ZmMwMy1mNjIxLTRmYzEtOTVmNS1hNDYxNDcxMmFkMDciLCJpYXQiOjE2ODAzMDg1OTgsImV4cCI6MTY4MDM5NDk5OH0.uIHVTa4D7CxE9QmEKzFq34XGFTK44MFU4giqmVVGNeE
   ```
 
   En JWT er delt opp i tre base64-encoded deler: `header`, `payload` og `signature`. Dersom vi decoder vår JWT får vi følgende strukturer tilbake:
@@ -64,15 +64,15 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
       "alg": "HS256"
     },
     {
-      "adjective1": "lys",
-      "adjective2": "høyteknologisk",
-      "challenge": "40a8",
-      "solves": 17,
-      "jti": "af4d3398-c4a1-4068-a979-2c06ec6589d5",
-      "iat": 1680296020,
-      "exp": 1680299620
+      "adjective1": "frastøtende",
+      "adjective2": "humpete",
+      "challenge": "8da1",
+      "solves": 0,
+      "jti": "f1c8fc03-f621-4fc1-95f5-a4614712ad07",
+      "iat": 1680308598,
+      "exp": 1680394998
     },
-    "Y_PRAzod6VyFG021w"
+    "uIHVTa4D7CxE9QmEKzFq34XGFTK44MFU4giqmVVGNeE"
   ]
   ```
 
@@ -89,13 +89,13 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
       "alg": "none"
     },
     {
-      "adjective1": "lys",
-      "adjective2": "høyteknologisk",
-      "challenge": "40a8",
+      "adjective1": "frastøtende",
+      "adjective2": "humpete",
+      "challenge": "8da1",
       "solves": 100000000,
-      "jti": "af4d3398-c4a1-4068-a979-2c06ec6589d5",
-      "iat": 1680296020,
-      "exp": 1680299620
+      "jti": "f1c8fc03-f621-4fc1-95f5-a4614712ad07",
+      "iat": 1680308598,
+      "exp": 1680394998
     }
   ]
   ```
@@ -103,7 +103,7 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
   Dersom vi nå koder denne strukturen tilbake til en gyldig JWT:
 
   ```
-  eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhZGplY3RpdmUxIjoibHlzIiwiYWRqZWN0aXZlMiI6ImjDuHl0ZWtub2xvZ2lzayIsImNoYWxsZW5nZSI6IjQwYTgiLCJzb2x2ZXMiOjEwMDAwMDAwMCwianRpIjoiYWY0ZDMzOTgtYzRhMS00MDY4LWE5NzktMmMwNmVjNjU4OWQ1IiwiaWF0IjoxNjgwMjk2MDIwLCJleHAiOjE2ODAyOTk2MjB9
+  eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhZGplY3RpdmUxIjoiZnJhc3TDuHRlbmRlIiwiYWRqZWN0aXZlMiI6Imh1bXBldGUiLCJjaGFsbGVuZ2UiOiI4ZGExIiwic29sdmVzIjoxMDAwMDAwMDAsImp0aSI6ImYxYzhmYzAzLWY2MjEtNGZjMS05NWY1LWE0NjE0NzEyYWQwNyIsImlhdCI6MTY4MDMwODU5OCwiZXhwIjoxNjgwMzk0OTk4fQ
   ```
 
   Så kan den brukes for å "lure" serveren til å tro at vi nå har åpnet 100 000 000 påskeegg og gi oss belønningen våres
