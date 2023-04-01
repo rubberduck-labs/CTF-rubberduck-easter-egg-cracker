@@ -41,10 +41,20 @@ export class Terminal extends TwLitElement {
       }
     }
 
+    @keyframes spin {
+      from {
+        transform:rotate(0deg);
+      }
+      to {
+        transform:rotate(360deg);
+      }
+    }
+
     #terminal {
       color: white;
       font-size: 1.25em;
       font-family: monospace;
+      width: 700px;
       max-width: 100vw;
     }
 
@@ -70,6 +80,11 @@ export class Terminal extends TwLitElement {
 
     .cursor {
       animation: blink 1s infinite;
+    }
+
+    .spinning {
+      display: inline-block;
+      animation: spin 0.8s infinite linear;
     }
   `
 
@@ -146,7 +161,7 @@ export class Terminal extends TwLitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('seek-command', (event: CustomEvent<TerminalCommandSeek>) => {
-      this.addLine(`rbck: command not found: ${event.detail.command}`);
+      this.addLine(`rbdck: command not found: ${event.detail.command}`);
     });
   }
 
@@ -157,7 +172,10 @@ export class Terminal extends TwLitElement {
           
         </div>
         <p>
-          <span>></span>
+          ${!this.runningPID
+            ? html`<span>></span>`
+            : html`<span class="spinning">|</span>`
+          }
           <span
             id="input"
             class="outline-none caret-transparent"
