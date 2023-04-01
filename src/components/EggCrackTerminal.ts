@@ -53,6 +53,10 @@ export class EggCrackTerminal extends TwLitElement {
       color: #66bb6a;
     }
 
+    .unimportant {
+      color: #949494;
+    }
+
     .cursor {
       animation: blink 1s infinite;
     }
@@ -89,13 +93,13 @@ export class EggCrackTerminal extends TwLitElement {
 
     const hashLookupPartElement = document.createElement('span');
     hashLookupPartElement.innerText = hash.substring(0, answerLength);
+    hashLookupPartElement.classList.add(valid ? 'valid' : 'invalid');
     
     const hashRestElement = document.createElement('span');
     hashRestElement.innerText = hash.substring(answerLength);
+    hashRestElement.classList.add('unimportant');
 
     const hashElement = document.createElement('p');
-
-    hashLookupPartElement.classList.add(valid ? 'valid' : 'invalid');
     hashElement.classList.add('line');
     hashElement.appendChild(hashLookupPartElement);
     hashElement.appendChild(hashRestElement);
@@ -104,9 +108,17 @@ export class EggCrackTerminal extends TwLitElement {
   }
 
   private solve(numberOfHashes: number) {
-    const solveMessageElement = document.createElement('p');
-    solveMessageElement.classList.add('line', 'valid');
-    solveMessageElement.innerText = `OK - Cracked egg on attempt ${numberOfHashes}`;
+    const okMessageElement = document.createElement('span');
+    okMessageElement.innerText = '[OK]';
+    okMessageElement.classList.add('valid');
+
+    const restMessageElement = document.createElement('span');
+    restMessageElement.innerText = ` - Cracked egg with adjustment ${numberOfHashes}`;
+
+    const solveMessageElement = document.createElement('p');;
+    solveMessageElement.classList.add('line');
+    solveMessageElement.appendChild(okMessageElement);
+    solveMessageElement.appendChild(restMessageElement);
 
     this.terminal.appendChild(solveMessageElement);
     setTimeout(() => this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: numberOfHashes })), 4000)
