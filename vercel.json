@@ -4,5 +4,12 @@
       "source": "/(.*)",
       "destination": "/"
     }
-  ]
+  ],
+  "functions": {
+    "api/easter_egg.ts": {
+      "memory": 128,
+      "maxDuration": 2,
+      "includeFiles": "api_resources/reward.jpeg"
+    }
+  }
 }
