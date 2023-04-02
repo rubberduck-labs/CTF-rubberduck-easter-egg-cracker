@@ -56,6 +56,12 @@ export class Terminal extends TwLitElement {
       font-family: monospace;
       width: 700px;
       max-width: 100vw;
+      max-height: 90vh;
+      overflow-y: scroll;
+      scrollbar-width: none;
+    }
+    #terminal::-webkit-scrollbar {
+      display: none;
     }
 
     .line {
@@ -161,16 +167,13 @@ export class Terminal extends TwLitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('seek-command', (event: CustomEvent<TerminalCommandSeek>) => {
-      this.addLine(`rbdck: command not found: ${event.detail.command}`);
+      this.addLine(`<span class="invalid">command not found: ${event.detail.command}</span>`);
     });
   }
 
   render(): TemplateResult {
     return html`
-      <div id="terminal" class="bg-black p-5 flex flex-col">
-        <div id="commands" class="flex flex-col">
-          
-        </div>
+      <div id="terminal" class="bg-black p-5 flex flex-col-reverse" @click="${() => this.input.focus()}">
         <p>
           ${!this.runningPID
             ? html`<span>></span>`
@@ -184,6 +187,7 @@ export class Terminal extends TwLitElement {
             spellcheck="false"
           ></span><span class="cursor">_</span>
         </p>
+        <div id="commands" class="flex flex-col"></div>
       </div>
     `;
   }
