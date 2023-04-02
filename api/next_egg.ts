@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHash } from 'crypto';
 import { getRandomAdjective } from '../api_resources/adjectives';
+import validateLogin from '../api_resources/validate_login';
 import { readFileSync } from 'fs';
 import path from 'path';
 import jwt from 'njwt';
@@ -58,6 +59,7 @@ function createNewSession(solves: number = 0, error?: string) {
 export default async function (req: VercelRequest, res: VercelResponse) {
   try {
     const session = req.cookies['session'];
+    validateLogin(req);
 
     if (!!session) {
       // If we have a session, parse the session as a JWT

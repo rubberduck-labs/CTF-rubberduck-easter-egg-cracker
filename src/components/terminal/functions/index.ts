@@ -3,11 +3,13 @@ import { TerminalCommandSeek } from "../Terminal";
 import help from "./help";
 import ls from "./ls";
 import clear from "./clear";
+import login from "./login.sh";
 
 const commands = {
   'help': help,
   'ls': ls,
-  'clear': clear
+  'clear': clear,
+  'login.sh': login
 };
 
 // Register global event listener for runner functions
