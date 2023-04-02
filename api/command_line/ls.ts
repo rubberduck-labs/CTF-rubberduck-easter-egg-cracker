@@ -1,17 +1,57 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import fs from "fs";
-import path from "path";
 
 const directory = 'color: #004FFF;';
+const locked = 'color: #454851';
 const file = 'color: white;';
+const filesAndDirectories = [
+  {
+    egg: true,
+    directory: false,
+    locked: false,
+    name: 'easter_egg.png'
+  },
+  {
+    directory: false,
+    locked: true,
+    name: 'eggCrack.sh'
+  },
+  {
+    directory: false,
+    locked: true,
+    name: 'file_5424.tmp'
+  },
+  {
+    directory: false,
+    locked: true,
+    name: 'file_9273.tmp'
+  },
+  {
+    directory: false,
+    locked: true,
+    name: 'file_2331.tmp'
+  },
+  {
+    directory: false,
+    locked: true,
+    name: 'file_9207.tmp'
+  }
+];
+
+const EASTER_EGG_FLAG = process.env.EASTER_EGG_FLAG;
 
 export default async function(req: VercelRequest, res: VercelResponse) {
-  try {
-    const param = (req.query.param as string) || '';
-    const filesAndDirectories = fs.readdirSync(path.join(process.cwd(), param), { withFileTypes: true });
-    const entries = filesAndDirectories.map(dirent => `
-      <p style="${dirent.isDirectory() ? directory : file}">${dirent.name}</p>
-    `);
+  try {    
+    const entries = filesAndDirectories.map(dirent => dirent.egg
+      ? `
+        <a style="text-decoration: underline; ${directory}" target="_blank" href="/api/command_line/flag?key=${EASTER_EGG_FLAG}">
+          ${dirent.name}
+        </a>
+      `
+      : `
+        <p style="${dirent.directory ? directory : file} ${dirent.locked ? locked : ''}">
+          ${dirent.name}
+        </p>
+      `);
 
     return res.send(`
       <div style="display: grid; grid-template-columns: auto auto auto;">

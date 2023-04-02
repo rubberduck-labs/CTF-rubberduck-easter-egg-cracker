@@ -7,15 +7,10 @@
     }
   ],
   "functions": {
-    "api/command_line/render.ts": {
-      "memory": 128,
-      "maxDuration": 5,
-      "includeFiles": "api_resources/commandline/*.png"
-    },
     "api/command_line/*.ts": {
       "memory": 128,
       "maxDuration": 5,
-      "includeFiles": "api_resources/commandline/*"
+      "includeFiles": "api_resources/command_line/*"
     },
     "api/next_egg.ts": {
       "memory": 128,

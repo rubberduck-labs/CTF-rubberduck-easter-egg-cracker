@@ -1,14 +1,8 @@
-let currentPath = './';
-
 const recognizedCommands = {
-  ls: (path) => fetch(`/api/command_line/ls?param=${currentPath + (path || '')}`)
+  ls: () => fetch(`/api/command_line/ls`)
     .then(response => response.ok ? response.text() : '<span class="invalid">failed to call command</span>'),
-  help: (func) => fetch(`/api/command_line/help?param=${func || ''}`)
-    .then(response => response.ok ? response.text() : '<span class="invalid">failed to call command</span>'),
-  cat: (path) => fetch(`/api/command_line/cat?param=${currentPath + (path || '')}`)
-    .then(response => response.ok ? response.text() : '<span class="invalid">failed to call command</span>'),
-  render: (path) => fetch(`/api/command_line/render?param=${currentPath + (path || '')}`)
-    .then(response => response.ok ? response.text() : '<span class="invalid">failed to call command</span>'),
+  help: () => fetch(`/api/command_line/help`)
+    .then(response => response.ok ? response.text() : '<span class="invalid">failed to call command</span>')
 };
 
 (function () {
@@ -28,11 +22,6 @@ const recognizedCommands = {
     if (command === 'clear') {
       event.stopPropagation();
       terminal.commands.innerHTML = '';
-    }
-
-    if (command === 'cd') {
-      event.stopPropagation();
-      currentPath += `${param}/`;
     }
   })
 })();
