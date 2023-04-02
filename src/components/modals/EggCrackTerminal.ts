@@ -53,7 +53,7 @@ export class EggCrackTerminal extends TwLitElement {
           if (isValid) {
             await println(`<span class="valid">[OK]</span> - Cracked egg with adjustment ${i}`);
             await Sleep(1500); // Wait a few seconds for the user to read OK message
-            this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: i }));
+            return this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: i }));
           }
         }
       }
