@@ -1,11 +1,11 @@
 import { css, TemplateResult } from "lit";
 import { html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { TwLitElement } from "../common/TwLitElement";
-import Sleep from "../common/Sleep";
-import { Terminal, TerminalCommandComplete } from "./Terminal";
+import { TwLitElement } from "../../common/TwLitElement";
+import Sleep from "../../common/Sleep";
+import { TerminalRunner } from "../terminal/Terminal";
 
-import "./Terminal";
+import "../terminal/Terminal";
 
 @customElement("x-egg-crack-terminal")
 export class EggCrackTerminal extends TwLitElement {
@@ -22,15 +22,7 @@ export class EggCrackTerminal extends TwLitElement {
   public challenge: string;
 
   @state()
-  private crackEggFunction: Function = undefined;
-
-  private crackEggPID: number;
-
-  private closeTerminal(result: CustomEvent<TerminalCommandComplete>) {
-    if (this.crackEggPID === result.detail.PID) {
-      this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: result.detail.result }))
-    }
-  }
+  private crackEggFunction: TerminalRunner = undefined;
 
 
   private async hash(string): Promise<string> {
@@ -45,10 +37,7 @@ export class EggCrackTerminal extends TwLitElement {
 
   firstUpdated() {
     if (!this.crackEggFunction) {
-      this.crackEggFunction = async (context: Terminal) => {
-        this.crackEggPID = context.runningPID;
-        const println = context.getWriter();
-
+      this.crackEggFunction = async (context, println, prompt) => {
         await println(`sh ./eggCrack.sh --desc1 ${this.adjective1} --desc2 ${this.adjective2} --hash ${this.challenge}`);
         for (let i = 0; true; i++) {
           const hash = await this.hash(this.adjective1 + this.adjective2 + i);
@@ -64,7 +53,7 @@ export class EggCrackTerminal extends TwLitElement {
           if (isValid) {
             await println(`<span class="valid">[OK]</span> - Cracked egg with adjustment ${i}`);
             await Sleep(1500); // Wait a few seconds for the user to read OK message
-            return i;
+            this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: i }));
           }
         }
       }
@@ -76,7 +65,6 @@ export class EggCrackTerminal extends TwLitElement {
       <div class="rounded-md overflow-hidden">
         <x-terminal
           .run="${this.crackEggFunction}"
-          @command-complete="${this.closeTerminal}"
         ></x-terminal>
       </div>
     `;

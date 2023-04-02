@@ -1,8 +1,10 @@
 import { css, TemplateResult } from "lit";
 import { html } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { TwLitElement } from "../common/TwLitElement";
-import Sleep from "../common/Sleep";
+import DOMPurify from "dompurify";
+import { TwLitElement } from "../../common/TwLitElement";
+import Sleep from "../../common/Sleep";
+import "./functions";
 
 export type TerminalCommandComplete = {
   PID: number;
@@ -13,6 +15,18 @@ export type TerminalCommandSeek = {
   command: string;
   terminal: Terminal;
 };
+
+export type TerminalWriter = (string: string) => Promise<void>;
+export type TerminalReader = (string: string) => Promise<string>;
+export type TerminalRunner = (terminal: Terminal, writer: TerminalWriter, reader: TerminalReader) => Promise<any>;
+
+function isSigterm(event: KeyboardEvent) {
+  return event.ctrlKey && event.key.toLowerCase() === 'c';
+}
+
+function isSubmit(event: KeyboardEvent) {
+  return event.key.toLowerCase() === 'enter';
+}
 
 @customElement("x-terminal")
 export class Terminal extends TwLitElement {
@@ -103,12 +117,15 @@ export class Terminal extends TwLitElement {
   @state()
   public runningPID: number;
 
+  @state()
+  public waitingForPrompt: boolean;
+
   @property({ type: Function })
-  public set run(runnable: (context: Terminal) => Promise<any>) {
+  public set run(runnable: TerminalRunner) {
     if (!!runnable) {
       const PID = Math.floor(Math.random() * 1000);
       this.runningPID = PID;
-      runnable(this)
+      runnable(this, this.getWriterForPID(PID), this.getReaderForPID(PID))
         .then(result => {
           if (!this.isAborted(PID)) {
             this.dispatchEvent(new CustomEvent<TerminalCommandComplete>('command-complete', {
@@ -117,7 +134,10 @@ export class Terminal extends TwLitElement {
           }
         })
         .catch(err => this.addLine(`<span class="invalid">[ERROR] - ${err}</span>`))
-        .finally(() => this.runningPID = undefined);
+        .finally(() => {
+          this.runningPID = undefined;
+          this.waitingForPrompt = false;
+        });
     }
   }
 
@@ -125,17 +145,40 @@ export class Terminal extends TwLitElement {
   private async addLine(lineContent: string) {
     const lineContentElement = document.createElement('p');
     lineContentElement.classList.add('line');
-    lineContentElement.innerHTML = lineContent;
+    lineContentElement.innerHTML = DOMPurify.sanitize(lineContent, { USE_PROFILES: { html: true } });
     this.commands.appendChild(lineContentElement);
     await Sleep(750); // Wait for line animation
+  }
+
+  private async getPrompt() {
+    this.waitingForPrompt = true;
+
+    let promtEventListener;
+    const submit = new Promise<string>((resolve, reject) => {
+      promtEventListener = (event: KeyboardEvent) => {
+        if (isSigterm(event)) reject('sigterm');
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          const result = this.input.innerText;
+          this.addLine(`> ${result}`);
+          this.input.innerText = '';
+          resolve(result);
+        }
+      };
+    });
+
+    this.input.addEventListener('keydown', promtEventListener);
+    return submit.finally(() => {
+      this.waitingForPrompt = false;
+      this.input.removeEventListener('keydown', promtEventListener);
+    })
   }
 
   public isAborted(PID: number) {
     return this.runningPID !== PID;
   }
 
-  public getWriter() {
-    const PID = this.runningPID;
+  private getWriterForPID(PID: number) {
     return async (string: string) => {
       if (!this.isAborted(PID)) {
         return this.addLine(string);
@@ -143,22 +186,35 @@ export class Terminal extends TwLitElement {
     }
   }
 
+  private getReaderForPID(PID: number) {
+    return async (string: string) => {
+      if (!this.isAborted(PID)) {
+        this.addLine(string);
+        return this.getPrompt();
+      }
+    }
+  }
+
   firstUpdated() {
     this.input.focus();
     this.input.addEventListener('keydown', event => {
-      if (event.ctrlKey && event.key.toLowerCase() === 'c' && !!this.runningPID) {
+      if (isSigterm(event) && !!this.runningPID) {
         this.addLine(`^C (aborted process[${this.runningPID}])`);
         this.runningPID = undefined;
       }
-      if (event.key === 'Enter') {
+      if (isSubmit(event) && !this.runningPID) {
         const command = this.input.innerText;
+
         this.addLine(`> ${command}`);
+        
         event.preventDefault();
+
         this.dispatchEvent(new CustomEvent<TerminalCommandSeek>('seek-command', {
           bubbles: true,
           composed: true,
           detail: { command, terminal: this }
         }));
+
         this.input.innerText = '';
       }
     });
@@ -175,14 +231,14 @@ export class Terminal extends TwLitElement {
     return html`
       <div id="terminal" class="bg-black p-5 flex flex-col-reverse" @click="${() => this.input.focus()}">
         <p>
-          ${!this.runningPID
+          ${!this.runningPID || this.waitingForPrompt
             ? html`<span>></span>`
             : html`<span class="spinning">|</span>`
           }
           <span
             id="input"
             class="outline-none caret-transparent"
-            contenteditable="${!this.runningPID}"
+            contenteditable="${!this.runningPID || this.waitingForPrompt}"
             tabindex="1"
             spellcheck="false"
           ></span><span class="cursor">_</span>
