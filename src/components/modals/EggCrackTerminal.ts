@@ -38,6 +38,8 @@ export class EggCrackTerminal extends TwLitElement {
   firstUpdated() {
     if (!this.crackEggFunction) {
       this.crackEggFunction = async (context, println, prompt) => {
+        const currentPID = context.runningPID;
+
         await println(`sh ./eggCrack.sh --desc1 ${this.adjective1} --desc2 ${this.adjective2} --hash ${this.challenge}`);
         for (let i = 0; true; i++) {
           const hash = await this.hash(this.adjective1 + this.adjective2 + i);
@@ -53,7 +55,9 @@ export class EggCrackTerminal extends TwLitElement {
           if (isValid) {
             await println(`<span class="valid">[OK]</span> - Cracked egg with adjustment ${i}`);
             await Sleep(1500); // Wait a few seconds for the user to read OK message
-            return this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: i }));
+            if (!context.isAborted(currentPID)) {
+              return this.dispatchEvent(new CustomEvent('resolve', { bubbles: true, detail: i }));
+            } 
           }
         }
       }
