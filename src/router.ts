@@ -62,6 +62,14 @@ const routes = [
           await checkForLogin();
           await import('./pages/CrackPage');
         }
+      },
+      {
+        path: '/reward',
+        component: 'x-reward-page',
+        action: async () => {
+          await checkForLogin();
+          await import('./pages/RewardPage');
+        }
       }
     ]
   },

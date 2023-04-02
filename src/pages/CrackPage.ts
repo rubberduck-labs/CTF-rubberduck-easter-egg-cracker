@@ -5,6 +5,7 @@ import { TwLitElement } from "../common/TwLitElement";
 import spawnModal from '../common/Modal';
 import type { Session } from '../../api/next_egg';
 import confetti from 'canvas-confetti';
+import { Router } from '@vaadin/router';
 
 import "../components/ChatBubble";
 import "../components/Ducky";
@@ -48,7 +49,7 @@ export class CrackPage extends TwLitElement {
   `;
 
   private async startInspection() {
-    const answer = await spawnModal(((await import('../components/EggCrackTerminal')).EggCrackTerminal), { ...this.sessionInfo });
+    const answer = await spawnModal(((await import('../components/modals/EggCrackTerminal')).EggCrackTerminal), { ...this.sessionInfo });
     await this.getNextEgg(answer);
     confetti({ particleCount: 100, spread: 70 });
   }
@@ -69,22 +70,8 @@ export class CrackPage extends TwLitElement {
 
   render(): TemplateResult {
     if (this.sessionInfo?.reward) {
-      const end = Date.now() + (10 * 1000);
-      const colors = ['F72585', '7209B7', '3A0CA3', '4361EE', '4CC9F0'];
-      (function frame() {
-        confetti({ colors, particleCount: 2, angle: 60, spread: 55, origin: { x: 0 } });
-        confetti({ colors, particleCount: 2, angle: 120, spread: 55, origin: { x: 1 } });
-      
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      }());
-      return html`
-        <div class="flex flex-col justify-center items-center">
-          <img class="rounded-lg w-1/2" src="data:image/jpeg;base64,${this.sessionInfo.reward}" />
-          <p class="pt-5 text-lg">Ingen flere påskeegg å åpne! Påskeharen er stolt av deg!</p>
-        </div>
-      `
+      // Session does not have reward - redirect to crack page
+      Router.go('/reward');
     } else {
       return html`
         <div class="flex flex-col justify-center items-center">
