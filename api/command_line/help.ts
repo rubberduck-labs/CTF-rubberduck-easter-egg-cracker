@@ -27,7 +27,7 @@ const help = `
   <div style="display: flex; justify-content: space-between;">
     <span>render</span>
     <div style="display:flex; flex-direction: column; align-items: end;">
-      <span> - render specified image in terminal (only .webp supported)</span>
+      <span> - render specified image in terminal</span>
       <span class="unimportant">example: render /some_folder/image.jpeg</span>
     </div>
   </div>
@@ -41,7 +41,7 @@ const help = `
   <div style="display: flex; justify-content: space-between;">
     <span>help</span>
     <div style="display:flex; flex-direction: column; align-items: end;">
-      <span> - prints this help message</span>
+      <span> - prints this help message</spwebpan>
       <span class="unimportant">example: help</span>
     </div>
   </div>

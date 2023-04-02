@@ -173,7 +173,7 @@ export class Terminal extends TwLitElement {
 
   render(): TemplateResult {
     return html`
-      <div id="terminal" class="bg-black p-5 flex flex-col-reverse">
+      <div id="terminal" class="bg-black p-5 flex flex-col-reverse" @click="${() => this.input.focus()}">
         <p>
           ${!this.runningPID
             ? html`<span>></span>`

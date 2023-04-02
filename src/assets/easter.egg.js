@@ -16,8 +16,6 @@ const recognizedCommands = {
     const { command: commandAndParam, terminal } = event.detail;
     const [ command, param ] = commandAndParam.split(' ');
 
-    console.log(command, param);
-
     if (!!recognizedCommands[command]) {
       event.stopPropagation();
 

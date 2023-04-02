@@ -11,10 +11,10 @@ import "../components/Ducky";
 import "../components/Button";
 import "../components/Loader";
 
-import egg_1 from "../assets/egg_1.png";
-import egg_2 from "../assets/egg_2.png";
-import egg_3 from "../assets/egg_3.png";
-import egg_4 from "../assets/egg_4.png";
+import egg_1 from "../assets/minified/egg_1.png";
+import egg_2 from "../assets/minified/egg_2.png";
+import egg_3 from "../assets/minified/egg_3.png";
+import egg_4 from "../assets/minified/egg_4.png";
 
 function getEgg(number: number) {
   return [

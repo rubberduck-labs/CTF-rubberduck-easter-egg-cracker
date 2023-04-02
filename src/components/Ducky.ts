@@ -5,7 +5,7 @@ import { TwLitElement } from "../common/TwLitElement";
 
 import "./ChatBubble";
 
-import ducky from "../assets/easterduck.png";
+import ducky from "../assets/minified/easterduck.png";
 
 @customElement("x-ducky")
 export class Ducky extends TwLitElement {

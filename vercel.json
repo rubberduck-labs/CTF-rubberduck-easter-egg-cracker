@@ -7,6 +7,11 @@
     }
   ],
   "functions": {
+    "api/command_line/render.ts": {
+      "memory": 128,
+      "maxDuration": 3,
+      "includeFiles": "api_resources/commandline/*.png"
+    },
     "api/command_line/*.ts": {
       "memory": 128,
       "maxDuration": 2,
@@ -14,7 +19,7 @@
     },
     "api/next_egg.ts": {
       "memory": 128,
-      "maxDuration": 2,
+      "maxDuration": 1,
       "includeFiles": "api_resources/reward.jpeg"
     }
   }
