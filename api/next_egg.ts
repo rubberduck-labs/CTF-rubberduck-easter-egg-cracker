@@ -70,7 +70,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       // If the verified session has more than REQUIRED_SOLVES consecutive solves we respond with the flag
       if (isSolved(verifiedSession)) {
         const reward = readFileSync(path.join(process.cwd(), 'api_resources', 'reward.jpeg'), 'base64');
-        console.log('SOLVED!');
+        console.log('SOLVED!', { session });
         return res.json({ reward: reward });
       }
   
@@ -93,6 +93,8 @@ export default async function (req: VercelRequest, res: VercelResponse) {
         // The user has provided a valid answer, we update their session with a new challenge and an increase to number of solves
         const currentAmountOfSolves = verifiedSession['solves'];
         const newSession = createNewSession(currentAmountOfSolves + 1);
+
+        console.log(`Bumping solves to ${currentAmountOfSolves + 1}`, { verifiedSession });
   
         // Sign the new session
         const signedNewSession = await signJwt(newSession);
@@ -111,7 +113,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       return res.json(newSession);
     }
   } catch (error) {
-    console.error(error);
+    console.error(error, { session: req.cookies['session'] });
     const newSession = createNewSession(0, error);
     const signedNewSession = await signJwt(newSession);
     res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
