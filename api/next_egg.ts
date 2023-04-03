@@ -71,7 +71,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       if (isSolved(verifiedSession)) {
         const reward = readFileSync(path.join(process.cwd(), 'api_resources', 'reward.jpeg'), 'base64');
         console.log('SOLVED!', { session });
-        return res.json({ reward: reward });
+        return res.json({ reward: reward, text: 'Godt jobbet. Sjekk ut https://ctf.rubberduck.no/reward (husk session cookie)' });
       }
   
       // Our session is verified
