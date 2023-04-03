@@ -13,13 +13,15 @@ export default async function(req: VercelRequest, res: VercelResponse) {
   const email = req.body.email;
   if (!!session && !!email) {
     const verifiedSession = await verifyJwt(session) as Session;
-    if (isSolved(verifiedSession) && EMAIL_REGEX.test(email)) {
+    if (isSolved(verifiedSession) && EMAIL_REGEX.test(email.trim())) {
       await axios.post(SLACK_HOOK, {
-        text: `🎉 En bruker har klart å løse CTF-oppgaven og har oppgitt epost: ${email}`
+        text: `🎉 En bruker har klart å løse CTF-oppgaven og har oppgitt epost: ${email.trim()}`
       });
       return res.status(200).json({ email });
+    } else {
+      return res.status(400).json({ error: 'session or email invalid' });
     }
+  } else {
+    return res.status(400).json({ error: 'session or email missing' });
   }
-
-  return res.status(400).json({ error: 'conditions not met' });
 }
