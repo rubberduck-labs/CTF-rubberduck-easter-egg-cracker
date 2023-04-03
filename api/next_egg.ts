@@ -20,17 +20,21 @@ export type Session = {
   reward: string; // The reward once our user reaches "REQUIRED_SOLVES"
 }
 
-const verifyJwt = (token, secret) => new Promise((resolve, reject) => {
+export const isSolved = (session: Session) => {
+  return session.solves >= REQUIRED_SOLVES;
+}
+
+export const verifyJwt = (token) => new Promise((resolve, reject) => {
   try {
     const { alg } = JSON.parse(Buffer.from(token.split('.')[0], 'base64').toString('utf-8'));
-    const response = jwt.verify(token, secret, alg);
+    const response = jwt.verify(token, PRIVATE_KEY, alg);
     resolve(response.body);
   } catch (error) {
     reject(error);
   }
 });
-const signJwt = (data, secret) => new Promise((resolve) => {
-  const response = jwt.create(data, secret);
+const signJwt = (data) => new Promise((resolve) => {
+  const response = jwt.create(data, PRIVATE_KEY);
   response.setExpiration(new Date().getTime() + (24*60*60*1000)); // 24 hours from now
   resolve(response);
 });
@@ -59,15 +63,14 @@ function createNewSession(solves: number = 0, error?: string) {
 export default async function (req: VercelRequest, res: VercelResponse) {
   try {
     const session = req.cookies['session'];
-    validateLogin(req);
-
     if (!!session) {
       // If we have a session, parse the session as a JWT
-      const verifiedSession = await verifyJwt(session, PRIVATE_KEY) as Session;
+      const verifiedSession = await verifyJwt(session) as Session;
   
       // If the verified session has more than REQUIRED_SOLVES consecutive solves we respond with the flag
-      if (verifiedSession.solves >= REQUIRED_SOLVES) {
+      if (isSolved(verifiedSession)) {
         const reward = readFileSync(path.join(process.cwd(), 'api_resources', 'reward.jpeg'), 'base64');
+        console.log('SOLVED!');
         return res.json({ reward: reward });
       }
   
@@ -92,7 +95,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
         const newSession = createNewSession(currentAmountOfSolves + 1);
   
         // Sign the new session
-        const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
+        const signedNewSession = await signJwt(newSession);
         res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
         return res.json(newSession);
       } else {
@@ -102,14 +105,14 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     } else {
       // We don't have a session, start by creating a new session for the user
       const newSession = createNewSession();
-      const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
+      const signedNewSession = await signJwt(newSession);
       res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
       return res.json(newSession);
     }
   } catch (error) {
     console.error(error);
     const newSession = createNewSession(0, error);
-    const signedNewSession = await signJwt(newSession, PRIVATE_KEY);
+    const signedNewSession = await signJwt(newSession);
     res.setHeader('Set-Cookie', `session=${signedNewSession}; Path=/`);
     return res.json(newSession);
   }
