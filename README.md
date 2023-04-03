@@ -106,7 +106,7 @@ For utvikling med Vite hot-relead anbefales det å også kjøre `npm run dev` so
   eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhZGplY3RpdmUxIjoiZnJhc3TDuHRlbmRlIiwiYWRqZWN0aXZlMiI6Imh1bXBldGUiLCJjaGFsbGVuZ2UiOiI4ZGExIiwic29sdmVzIjoxMDAwMDAwMDAsImp0aSI6ImYxYzhmYzAzLWY2MjEtNGZjMS05NWY1LWE0NjE0NzEyYWQwNyIsImlhdCI6MTY4MDMwODU5OCwiZXhwIjoxNjgwMzk0OTk4fQ
   ```
 
-  Så kan den brukes for å "lure" serveren til å tro at vi nå har åpnet 100 000 000 påskeegg og gi oss belønningen våres
+  Så kan den brukes for å "lure" serveren til å tro at vi nå har åpnet 100 000 000 påskeegg og gi oss belønningen våres.
 
   <br>
   <hr>
