@@ -20,11 +20,11 @@ export type Session = {
   reward: string; // The reward once our user reaches "REQUIRED_SOLVES"
 }
 
-const isSolved = (session: Session) => {
+export const isSolved = (session: Session) => {
   return session.solves >= REQUIRED_SOLVES;
 }
 
-const verifyJwt = (token) => new Promise((resolve, reject) => {
+export const verifyJwt = (token) => new Promise((resolve, reject) => {
   try {
     const { alg } = JSON.parse(Buffer.from(token.split('.')[0], 'base64').toString('utf-8'));
     const response = jwt.verify(token, PRIVATE_KEY, alg);
@@ -100,6 +100,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
         return res.json(newSession);
       } else {
         // The answer was not valid, respond with 400 and do not update the session
+        console.warn(`Someone tried to submit a bad answer to challange. answer=${fullAnswer}, challange=${challengeToSolve}`);
         return res.status(400).json({ error: 'bad challenge answer', ...verifiedSession });
       }
     } else {
