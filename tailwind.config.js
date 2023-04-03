@@ -10,7 +10,7 @@ module.exports = {
     },
     extend: {},
     colors: {
-      yellow: '#ffda37',
+      yellow: '#ffdb0f',
       accent: '#282626',
       ...colors
     },
