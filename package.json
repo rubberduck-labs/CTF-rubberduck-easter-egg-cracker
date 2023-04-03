@@ -18,9 +18,11 @@
     "vite": "^2.7.13"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.13.1",
     "@vaadin/router": "^1.7.4",
     "@vercel/node": "^2.10.2",
     "canvas-confetti": "^1.6.0",
+    "dompurify": "^3.0.1",
     "njwt": "^2.0.0",
     "postcss": "^8.4.14"
   }

@@ -10,7 +10,7 @@ export class Button extends TwLitElement {
 
   render(): TemplateResult {
     return html`
-      <button type="submit" class="rounded-md bg-accent text-white py-5 px-7">
+      <button type="submit" class="m-2 rounded-md bg-accent text-white py-5 px-7">
         <slot></slot>
       </button>
     `;
