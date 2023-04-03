@@ -83,7 +83,7 @@ export class RewardPage extends TwLitElement {
       return html`
         <div class="flex flex-col justify-center items-center">
           <img class="rounded-lg w-1/2" src="data:image/jpeg;base64,${this.reward}" />
-          <p class="py-5 text-2xl">Gratulerer du er en veldig iherdig kodeknekker!</p>
+          <p class="py-5 text-center text-2xl">Gratulerer du er en veldig iherdig kodeknekker!</p>
 
           ${this.registered
             ? ''
