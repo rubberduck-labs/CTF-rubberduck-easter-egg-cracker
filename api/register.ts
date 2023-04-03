@@ -28,11 +28,11 @@ const verifyJwt = (token) => new Promise((resolve, reject) => {
 
 export default async function(req: VercelRequest, res: VercelResponse) {
   const session = req.cookies['session'];
-  const email = req.body.email?.trim();
+  const email = req.body.email?.toLowerCase()?.trim() as string;
 
   const verifiedSession = await verifyJwt(session) as Session;
   const sessionSolved = isSolved(verifiedSession);
-  const isValidEmail = EMAIL_REGEX.test(email);
+  const isValidEmail = email?.match(EMAIL_REGEX);
 
   if (verifiedSession && sessionSolved && isValidEmail) {
     await axios.post(SLACK_HOOK, {
