@@ -25,7 +25,7 @@ export class RewardPage extends TwLitElement {
   private registered: boolean;
 
   private async getInfo(answer?: string) {
-    const eggSession = fetch('/api/next_egg')
+    const eggSession = fetch('/api/next_egg', { method: 'POST' })
       .then(response => response.json());
     // const userSession = dbConnect().auth
     //   .getSession()

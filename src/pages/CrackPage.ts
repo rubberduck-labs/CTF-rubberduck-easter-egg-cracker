@@ -58,7 +58,7 @@ export class CrackPage extends TwLitElement {
   private sessionInfo?: Session;
 
   private async getNextEgg(answer?: string) {
-    const apiPromise = fetch('/api/next_egg' + (!!answer ? `?padding=${answer}` : ''))
+    const apiPromise = fetch('/api/next_egg' + (!!answer ? `?padding=${answer}` : ''), { method: 'POST' })
       .then(response => response.json());
 
     this.sessionInfo = await spawnModal((await import('../components/Loader')).Loader, {}, apiPromise);
