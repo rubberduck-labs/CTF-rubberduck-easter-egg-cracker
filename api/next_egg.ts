@@ -20,11 +20,11 @@ export type Session = {
   reward: string; // The reward once our user reaches "REQUIRED_SOLVES"
 }
 
-export const isSolved = (session: Session) => {
+const isSolved = (session: Session) => {
   return session.solves >= REQUIRED_SOLVES;
 }
 
-export const verifyJwt = (token) => new Promise((resolve, reject) => {
+const verifyJwt = (token) => new Promise((resolve, reject) => {
   try {
     const { alg } = JSON.parse(Buffer.from(token.split('.')[0], 'base64').toString('utf-8'));
     const response = jwt.verify(token, PRIVATE_KEY, alg);

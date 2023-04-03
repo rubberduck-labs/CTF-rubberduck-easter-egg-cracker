@@ -29,17 +29,24 @@ const verifyJwt = (token) => new Promise((resolve, reject) => {
 export default async function(req: VercelRequest, res: VercelResponse) {
   const session = req.cookies['session'];
   const email = req.body.email?.trim();
-  if (!!session && !!email) {
-    const verifiedSession = await verifyJwt(session) as Session;
-    if (isSolved(verifiedSession) && EMAIL_REGEX.test(email)) {
-      await axios.post(SLACK_HOOK, {
-        text: `🎉 En bruker har klart å løse CTF-oppgaven og har oppgitt epost: ${email}`
-      });
-      return res.status(200).json({ email });
-    } else {
-      return res.status(400).json({ error: 'session or email invalid', session, email });
-    }
+
+  const verifiedSession = await verifyJwt(session) as Session;
+  const sessionSolved = isSolved(verifiedSession);
+  const isValidEmail = EMAIL_REGEX.test(email);
+
+  if (verifiedSession && sessionSolved && isValidEmail) {
+    await axios.post(SLACK_HOOK, {
+      text: `🎉 En bruker har klart å løse CTF-oppgaven og har oppgitt epost: ${email}`
+    });
+    return res.status(200).json({ email });
   } else {
-    return res.status(400).json({ error: 'session or email missing', session, email });
+    return res.status(400).json({
+      error: 'condition failed',
+      verifiedSession,
+      sessionSolved,
+      isValidEmail,
+      session,
+      email
+    });
   }
 }
