@@ -6,7 +6,6 @@ import { Router } from '@vaadin/router';
 import { html, css, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { TwLitElement } from "../common/TwLitElement";
-import { dbConnect } from "../util/Supabase";
 import spawnModal from '../common/Modal';
 
 import "../components/Button";
@@ -26,14 +25,14 @@ export class RewardPage extends TwLitElement {
   private async getInfo(answer?: string) {
     const eggSession = fetch('/api/next_egg')
       .then(response => response.json());
-    const userSession = dbConnect().auth
-      .getSession()
-      .then(({ data }) => data?.session?.user);
+    // const userSession = dbConnect().auth
+    //   .getSession()
+    //   .then(({ data }) => data?.session?.user);
     
 
-    const [egg, user]: [Session, boolean] = await spawnModal((await import('../components/Loader')).Loader, {}, Promise.all([eggSession, userSession]));
+    const egg: Session = await spawnModal((await import('../components/Loader')).Loader, {}, eggSession);
     this.reward = egg.reward;
-    this.loggedIn = !!user;
+    this.loggedIn = true;
   }
 
   private async showLogin() {
