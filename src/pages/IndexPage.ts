@@ -4,7 +4,6 @@ import { customElement } from "lit/decorators.js";
 import { TwLitElement } from "../common/TwLitElement";
 import { Router } from '@vaadin/router';
 
-import "../components/ChatBubble";
 import "../components/Ducky";
 import "../components/Button";
 
