@@ -10,18 +10,18 @@ const EMAIL_REGEX = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|
 
 export default async function(req: VercelRequest, res: VercelResponse) {
   const session = req.cookies['session'];
-  const email = req.body.email;
+  const email = req.body.email?.trim();
   if (!!session && !!email) {
     const verifiedSession = await verifyJwt(session) as Session;
-    if (isSolved(verifiedSession) && EMAIL_REGEX.test(email.trim())) {
+    if (isSolved(verifiedSession) && EMAIL_REGEX.test(email)) {
       await axios.post(SLACK_HOOK, {
-        text: `🎉 En bruker har klart å løse CTF-oppgaven og har oppgitt epost: ${email.trim()}`
+        text: `🎉 En bruker har klart å løse CTF-oppgaven og har oppgitt epost: ${email}`
       });
       return res.status(200).json({ email });
     } else {
-      return res.status(400).json({ error: 'session or email invalid' });
+      return res.status(400).json({ error: 'session or email invalid', session, email });
     }
   } else {
-    return res.status(400).json({ error: 'session or email missing' });
+    return res.status(400).json({ error: 'session or email missing', session, email });
   }
 }
