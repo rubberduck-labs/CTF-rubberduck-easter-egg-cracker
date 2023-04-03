@@ -22,7 +22,7 @@ export class App extends TwLitElement {
     return html`
       <div class="p-7 md:p-14 relative flex flex-col">
         <div class="pb-12 flex justify-between items-center">
-          <a href="/">
+          <a href="https://rubberduck.no">
             <img class="w-24" src="${rubberduck}" />
           </a>
           <div class="flex">
